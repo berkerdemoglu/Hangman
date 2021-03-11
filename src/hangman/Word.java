@@ -1,25 +1,44 @@
 package hangman;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Word {
-	private static ArrayList<String> wordsToChooseFrom = new ArrayList<String>(List.of("Force", "Momentum", "Impulse", "Displacement"));
+	private static ArrayList<String> wordsToChooseFrom;
+
+	static {
+		try {
+			wordsToChooseFrom = readWordsFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private StringBuilder chosenWord;
 	private StringBuilder dashedWord; // This variable will be shown to the player and will receive updates
 
-	public Word() {
+	public Word(int maxNumberOfAllowedGuesses) {
 		// Select a new word from available words.
-		chosenWord = chooseNewWord();
+		try {
+			readWordsFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		chosenWord = chooseNewWord(maxNumberOfAllowedGuesses);
 		dashedWord = new StringBuilder("");
-		dashedWord.append("-".repeat(chosenWord.length()));
+		for (int i = 0; i < chosenWord.length(); i++) {
+			dashedWord.append('*');
+		}
 
 		// Remove the selected word from the list of available words to make sure that it doesn't get selected again.
 		wordsToChooseFrom.remove(chosenWord.toString());
 	}
 
 	public StringBuilder getChosenWord() {
-		//todo check if you should return the string value or stringbuilder value
 		return chosenWord;
 	}
 
@@ -28,7 +47,6 @@ public class Word {
 	}
 
 	public StringBuilder getDashedWord() {
-		//todo check if you should return the string value or stringbuilder value
 		return dashedWord;
 	}
 
@@ -36,8 +54,25 @@ public class Word {
 		this.dashedWord = dashedWord;
 	}
 
-	private StringBuilder chooseNewWord() {
+	private StringBuilder chooseNewWord(int maxNumberOfAllowedGuesses) {
 		// Used in the constructor to select a random word.
-		return new StringBuilder(wordsToChooseFrom.get((int) (Math.random() * wordsToChooseFrom.size())));
+		while (true) {
+			StringBuilder newWord = new StringBuilder(wordsToChooseFrom.get((int) (Math.random() * wordsToChooseFrom.size())));
+			if (newWord.length() > maxNumberOfAllowedGuesses) {
+				return newWord;
+			}
+		}
+	}
+
+	private static ArrayList<String> readWordsFile() throws IOException {
+		ArrayList<String> words = new ArrayList<>();
+		Path wordsFilePath = Paths.get("game_words.txt");
+		Files.lines(wordsFilePath).forEach(words::add);
+
+		return words;
+	}
+
+	public static ArrayList<String> getWordsToChooseFrom() {
+		return wordsToChooseFrom;
 	}
 }
