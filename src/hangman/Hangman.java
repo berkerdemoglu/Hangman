@@ -44,6 +44,7 @@ public class Hangman {
 			} while (!isGameOver); // While the game is not over
 			isProgramRunning = checkUserWin();
 		}
+		System.out.println("Good bye!");
 	}
 
 	private char askUserGuess() {
