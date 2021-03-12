@@ -1,7 +1,9 @@
 title Hangman
 color F
-cls
+
+SetX HANGMAN_PATH "%cd%"
 
 cls
+
 java -jar Hangman.jar
 exit
