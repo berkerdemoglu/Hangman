@@ -14,8 +14,8 @@ public class Hangman {
 	private int numberOfLosses;
 
 	public Hangman() {
-		// A backup ctor, main fn allows user to enter max allowed guesses.
-		this(5);
+		// A backup ctor
+		this(6);
 	}
 
 	public Hangman(int maxNumberOfAllowedGuesses) {
@@ -34,7 +34,7 @@ public class Hangman {
 
 		System.out.println("Welcome to Hangman!\n");
 		while (isProgramRunning) {
-			word = new Word(); // It will choose a new word every time.
+			word = new Word(howManyLetters()); // It will choose a new word every time.
 			previousGuesses = new ArrayList<>(); // Create an empty list to store user's guesses.
 			numberOfMadeGuesses = 0;
 			System.out.printf("I have chosen a word with %d letters!\n\n", word.getChosenWord().length());
@@ -50,6 +50,21 @@ public class Hangman {
 			isProgramRunning = checkUserWin();
 		}
 		System.out.println("Good bye!");
+	}
+
+	private int howManyLetters() {
+		int letters;
+		do {
+			System.out.print("How many letters would you like? ");
+			letters = scanner.nextInt();
+			if (letters > 1) {
+				break;
+			} else {
+				System.out.println("Invalid input. Please enter a number greater than 1.");
+			}
+		} while (true);
+
+		return letters;
 	}
 
 	private char askUserGuess() {
@@ -132,7 +147,7 @@ public class Hangman {
 		Prints how many guesses the user has remaining, the letters they have guessed, the word covered with dashes.
 		 */
 		if (numberOfMadeGuesses != maxNumberOfAllowedGuesses) {
-			System.out.printf(word.getDashedWord() + " (%d guesses left)\n", maxNumberOfAllowedGuesses - numberOfMadeGuesses);
+			System.out.printf(word.getDashedWord() + " (%d false guesses left)\n", maxNumberOfAllowedGuesses - numberOfMadeGuesses);
 			System.out.println("Your previous guesses: " + previousGuesses + " \n");
 		}
 	}
