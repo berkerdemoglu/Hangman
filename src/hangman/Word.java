@@ -58,7 +58,7 @@ public class Word {
 		// Used in the constructor to select a random word.
 		while (true) {
 			StringBuilder newWord = new StringBuilder(wordsToChooseFrom.get((int) (Math.random() * wordsToChooseFrom.size())));
-			if (newWord.length() > letters) {
+			if (newWord.length() == letters) {
 				return newWord;
 			}
 		}
