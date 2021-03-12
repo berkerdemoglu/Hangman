@@ -34,7 +34,7 @@ public class Hangman {
 
 		System.out.println("Welcome to Hangman!\n");
 		while (isProgramRunning) {
-			word = new Word(maxNumberOfAllowedGuesses); // It will choose a new word every time.
+			word = new Word(); // It will choose a new word every time.
 			previousGuesses = new ArrayList<>(); // Create an empty list to store user's guesses.
 			numberOfMadeGuesses = 0;
 			System.out.printf("I have chosen a word with %d letters!\n\n", word.getChosenWord().length());

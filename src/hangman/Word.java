@@ -20,7 +20,7 @@ public class Word {
 	private StringBuilder chosenWord;
 	private StringBuilder dashedWord; // This variable will be shown to the player and will receive updates
 
-	public Word(int maxNumberOfAllowedGuesses) {
+	public Word() {
 		// Select a new word from available words.
 		try {
 			readWordsFile();
@@ -28,7 +28,7 @@ public class Word {
 			e.printStackTrace();
 		}
 
-		chosenWord = chooseNewWord(maxNumberOfAllowedGuesses);
+		chosenWord = chooseNewWord();
 		dashedWord = new StringBuilder("");
 		for (int i = 0; i < chosenWord.length(); i++) {
 			dashedWord.append('*');
@@ -54,14 +54,9 @@ public class Word {
 		this.dashedWord = dashedWord;
 	}
 
-	private StringBuilder chooseNewWord(int maxNumberOfAllowedGuesses) {
+	private StringBuilder chooseNewWord() {
 		// Used in the constructor to select a random word.
-		while (true) {
-			StringBuilder newWord = new StringBuilder(wordsToChooseFrom.get((int) (Math.random() * wordsToChooseFrom.size())));
-			if (newWord.length() > maxNumberOfAllowedGuesses) {
-				return newWord;
-			}
-		}
+		return new StringBuilder(wordsToChooseFrom.get((int) (Math.random() * wordsToChooseFrom.size())));
 	}
 
 	private static ArrayList<String> readWordsFile() throws IOException {
