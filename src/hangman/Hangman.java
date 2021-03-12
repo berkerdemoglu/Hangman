@@ -114,7 +114,7 @@ public class Hangman {
 			returnValue = 0;
 		}
 
-		if (!Character.isAlphabetic(letter)) { // If character is not alphabetic
+		if (!Character.isLetter(letter)) { // If character is not alphabetic
 			returnValue = -2;
 		}
 
@@ -193,14 +193,14 @@ public class Hangman {
 	private void evaluateWordGuessResult(String guess, int guessResult) {
 		switch (guessResult) {
 			case 1:
-				System.out.println("Your guess is correct!\n");
+				System.out.println(guess + "is correct!\n");
 				word.setDashedWord(word.getChosenWord()); // remove dashes so the game can end
 				break;
 			case 0:
 				System.out.println("You have previously guessed this word. Try again.\n");
 				break;
 			case -1:
-				System.out.println("Your guess is incorrect.\n");
+				System.out.println(guess + "is incorrect.\n");
 				numberOfMadeGuesses++;
 				break;
 			case -2:
