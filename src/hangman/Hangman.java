@@ -6,7 +6,8 @@ import java.util.Scanner;
 public class Hangman {
 	private final Scanner scanner;
 	private Word word;
-	private ArrayList<Character> previousGuesses;
+	private ArrayList<Character> previousLetterGuesses;
+	private ArrayList<String> previousWordGuesses;
 	private int numberOfMadeGuesses;
 	private final int maxNumberOfAllowedGuesses;
 
@@ -29,24 +30,39 @@ public class Hangman {
 		// Runs the hangman game.
 		boolean isProgramRunning = true; // Used for playing the game again
 		boolean isGameOver = false; // Used for making letter guesses for a word
-		char guess;
+		String guess;
+		char letterGuess;
 		int guessResult;
+		int numberOfLetters;
 
 		System.out.println("Welcome to Hangman!\n");
 		while (isProgramRunning) {
-			word = new Word(howManyLetters()); // It will choose a new word every time.
-			previousGuesses = new ArrayList<>(); // Create an empty list to store user's guesses.
+			numberOfLetters = howManyLetters();
+			word = new Word(numberOfLetters); // It will choose a new word every time.
+			previousLetterGuesses = new ArrayList<>(); // Create two empty lists to store user's guesses.
+			previousWordGuesses = new ArrayList<>();
 			numberOfMadeGuesses = 0;
-			System.out.printf("I have chosen a word with %d letters!\n\n", word.getChosenWord().length());
+			System.out.println("I have chosen a new word!");
 
 			do {
-				guess = askUserGuess(); // Ask the user for a letter
-				guessResult = tryLetter(guess); // Try and see if the user's guess was correct
-				addGuessToList(guess); // Add it to the list of guesses
-				evaluateGuessResult(guess, guessResult); // Evaluate the user's guess
+				guess = askUserGuess(); // Ask the user for a guess
+				if (guess.length() == 1) { // If the user has entered a letter
+					letterGuess = guess.charAt(0);
+					guessResult = tryLetter(letterGuess); // Try and see if the user's entry was correct
+					addLetterGuessToList(letterGuess);
+					evaluateLetterGuessResult(letterGuess, guessResult);
+				} else if (guess.length() != word.getChosenWord().length()) { // If the user has entered a word not matching the number of letters
+					System.out.println(guess + " is not a valid guess. Please try again.");
+				} else { // If the user has entered a word matching the number of letters
+					guessResult = tryWord(guess);
+					addWordGuessToList(guess, guessResult);
+					evaluateWordGuessResult(guess, guessResult);
+				}
+
 				printGameInfo();
 				isGameOver = isGameOver(); // Check if the loop should end
 			} while (!isGameOver); // While the game is not over
+
 			isProgramRunning = checkUserWin();
 		}
 		System.out.println("Good bye!");
@@ -56,7 +72,7 @@ public class Hangman {
 		int letters;
 		do {
 			System.out.print("How many letters would you like? ");
-			letters = scanner.nextInt();
+			letters = Integer.parseInt(scanner.nextLine());
 			if (letters > 1) {
 				break;
 			} else {
@@ -67,21 +83,13 @@ public class Hangman {
 		return letters;
 	}
 
-	private char askUserGuess() {
+	private String askUserGuess() {
 		/*
-		Takes the user's guess and returns it as a char.
-		If the user enters 2 or more letters, it will request the user to enter a valid letter.
+		Takes the user's guess and returns it as a String.
 		 */
-		String userGuess = "";
-		do {
-			System.out.print("Enter a letter: ");
-			userGuess = scanner.nextLine();
-			if (userGuess.length() != 1) {
-				System.out.println("Invalid input. Please try again.");
-			}
-		} while (userGuess.length() != 1);
+		System.out.print("Enter your guess: ");
 
-		return userGuess.charAt(0);
+		return scanner.nextLine();
 	}
 
 	private int tryLetter(char letter) {
@@ -102,7 +110,7 @@ public class Hangman {
 			returnValue = -1;
 		}
 
-		if (previousGuesses.contains(letter)) { // If guess was previously made
+		if (previousLetterGuesses.contains(letter)) { // If guess was previously made
 			returnValue = 0;
 		}
 
@@ -113,13 +121,13 @@ public class Hangman {
 		return returnValue;
 	}
 
-	private void addGuessToList(char guess) {
-		if (!previousGuesses.contains(guess) && Character.isAlphabetic(guess)) { // If guess was not made previously
-			previousGuesses.add(Character.toLowerCase(guess));
+	private void addLetterGuessToList(char guess) {
+		if (!previousLetterGuesses.contains(guess) && Character.isAlphabetic(guess)) { // If guess was not made previously
+			previousLetterGuesses.add(Character.toLowerCase(guess));
 		}
 	}
 
-	private void evaluateGuessResult(char letter, int guessResult) {
+	private void evaluateLetterGuessResult(char letter, int guessResult) {
 		switch (guessResult) {
 			case 1: // if letter was found in the word
 				System.out.println("You have guessed correctly!\n");
@@ -142,13 +150,78 @@ public class Hangman {
 		}
 	}
 
+	private int tryWord(String guess) {
+		/*
+		Possible return values are:
+		1 if word matches the chosen word
+		0 if word was previously guessed
+		-1 if word does not match the chosen word
+		-2 if word is not alphabetic
+
+		This function does not need to specify a return value if the number of letters does not match the word's,
+		because that is already handled in runGame().
+		 */
+		int returnValue;
+
+		if (guess.equalsIgnoreCase(word.getChosenWord().toString())) { // if guess matches the chosen word
+			returnValue = 1;
+		} else { // if guess does not match the chosen word
+			returnValue = -1;
+		}
+
+		if (previousWordGuesses.contains(guess)) { // if word was previously guessed
+			returnValue = 0;
+		}
+
+		// Check if the word is alphabetic
+		for (int i = 0; i < guess.length(); i++) {
+			if (!Character.isLetter(guess.charAt(i))) { // if char is not a letter
+				returnValue = -2;
+				break;
+			}
+		}
+
+		return returnValue;
+	}
+
+	private void addWordGuessToList(String guess, int guessResult) {
+		if (guessResult != -2 && guessResult != 0) {
+			previousWordGuesses.add(guess);
+		}
+	}
+
+	private void evaluateWordGuessResult(String guess, int guessResult) {
+		switch (guessResult) {
+			case 1:
+				System.out.println("Your guess is correct!\n");
+				word.setDashedWord(word.getChosenWord()); // remove dashes so the game can end
+				break;
+			case 0:
+				System.out.println("You have previously guessed this word. Try again.\n");
+				break;
+			case -1:
+				System.out.println("Your guess is incorrect.\n");
+				numberOfMadeGuesses++;
+				break;
+			case -2:
+				System.out.println("Please enter a valid word.");
+				break;
+		}
+	}
+
 	private void printGameInfo() {
 		/*
 		Prints how many guesses the user has remaining, the letters they have guessed, the word covered with dashes.
 		 */
 		if (numberOfMadeGuesses != maxNumberOfAllowedGuesses) {
 			System.out.printf(word.getDashedWord() + " (%d false guesses left)\n", maxNumberOfAllowedGuesses - numberOfMadeGuesses);
-			System.out.println("Your previous guesses: " + previousGuesses + " \n");
+			System.out.println("Your previous letter guesses: " + previousLetterGuesses);
+
+			if (!previousWordGuesses.isEmpty()) { // if word guesses have been made
+				System.out.println("Your previous word guesses: " + previousWordGuesses);
+			}
+
+			System.out.println(); // print an empty line for better readability
 		}
 	}
 
