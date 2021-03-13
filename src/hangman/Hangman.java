@@ -2,6 +2,7 @@ package hangman;
 
 import java.util.LinkedList;
 import java.util.Scanner;
+import command.Command;
 
 public class Hangman {
 	private final Scanner scanner;
@@ -9,10 +10,13 @@ public class Hangman {
 	private LinkedList<Character> previousLetterGuesses;
 	private LinkedList<String> previousWordGuesses;
 	private int numberOfMadeGuesses;
-	private final int maxNumberOfAllowedGuesses;
+	private int maxNumberOfAllowedGuesses;
 
 	private int numberOfWins;
 	private int numberOfLosses;
+
+	private boolean isProgramRunning;
+	private boolean isGameOver;
 
 	public Hangman() {
 		// A backup ctor
@@ -24,19 +28,24 @@ public class Hangman {
 		scanner = new Scanner(System.in);
 		numberOfWins = 0;
 		numberOfLosses = 0;
+		isProgramRunning = true; // Used for playing the game again
+		isGameOver = false; // Used for making letter guesses for a word
 	}
 
 	public void runGame() {
 		// Runs the hangman game.
-		boolean isProgramRunning = true; // Used for playing the game again
-		boolean isGameOver = false; // Used for making letter guesses for a word
 		String guess;
 		char letterGuess;
 		int guessResult;
 		int numberOfLetters;
 
+		Command command = new Command(this);
+		int commandResult;
+
 		System.out.println("Welcome to Hangman!\n");
+		System.out.println("Enter /help for help with commands.");
 		while (isProgramRunning) {
+			commandResult = 0;
 			numberOfLetters = howManyLetters();
 			word = new Word(numberOfLetters); // It will choose a new word every time.
 			previousLetterGuesses = new LinkedList<>(); // Create two empty lists to store user's guesses.
@@ -46,7 +55,9 @@ public class Hangman {
 
 			do {
 				guess = askUserGuess(); // Ask the user for a guess
-				if (guess.length() == 1) { // If the user has entered a letter
+				if (guess.startsWith("/")) { // If the user has entered a command
+					commandResult = command.evaluateCommand(guess);
+				} else if (guess.length() == 1) { // If the user has entered a letter
 					letterGuess = guess.charAt(0);
 					guessResult = tryLetter(letterGuess); // Try and see if the user's entry was correct
 					addLetterGuessToList(letterGuess);
@@ -58,12 +69,18 @@ public class Hangman {
 					addWordGuessToList(guess, guessResult);
 					evaluateWordGuessResult(guess, guessResult);
 				}
-
-				printGameInfo();
-				isGameOver = isGameOver(); // Check if the loop should end
+				if (!isGameOver) { // To make sure that /new command works
+					isGameOver = isGameOver(); // Check if the loop should end
+					printGameInfo(isGameOver);
+				}
 			} while (!isGameOver); // While the game is not over
 
-			isProgramRunning = checkUserWin();
+			if (commandResult != 1 && commandResult != 2) { // if the command is not /new or /end
+				checkUserWin();
+			}
+			if (commandResult == 0) {
+				isProgramRunning = askReplay();
+			}
 		}
 		System.out.println("Good bye!");
 	}
@@ -209,11 +226,11 @@ public class Hangman {
 		}
 	}
 
-	private void printGameInfo() {
+	private void printGameInfo(boolean isGameOver) {
 		/*
-		Prints how many guesses the user has remaining, the letters they have guessed, the word covered with dashes.
+		Prints how many guesses the user has remaining, their guesses, the word covered with dashes.
 		 */
-		if (numberOfMadeGuesses != maxNumberOfAllowedGuesses) {
+		if (!isGameOver) { // check if the game is over
 			System.out.printf(word.getDashedWord() + " (%d false guesses left)\n", maxNumberOfAllowedGuesses - numberOfMadeGuesses);
 			System.out.println("Your previous letter guesses: " + previousLetterGuesses);
 
@@ -236,13 +253,11 @@ public class Hangman {
 				equals(word.getDashedWord().toString());
 	}
 
-	private boolean checkUserWin() {
+	private void checkUserWin() {
 		/*
 		Checks if user has won or lost.
 		Asks the user if they wish to continue playing or not.
 		 */
-		boolean returnValue = false;
-
 		if (word.getChosenWord().toString().equals(word.getDashedWord().toString())) { // user won
 			System.out.println("You win! You guessed the word that I chose! :)");
 			numberOfWins++;
@@ -252,6 +267,10 @@ public class Hangman {
 			numberOfLosses++;
 		}
 		System.out.printf("Score - %d correct, %d wrong\n", numberOfWins, numberOfLosses);
+	}
+
+	private boolean askReplay() {
+		boolean returnValue = false;
 
 		if (!Word.getWordsToChooseFrom().isEmpty()) { // If there are still words to choose from
 			String userOption;
@@ -274,5 +293,30 @@ public class Hangman {
 		}
 
 		return returnValue;
+	}
+
+	// Getters and Setters for Command
+	public int getMaxNumberOfAllowedGuesses() {
+		return maxNumberOfAllowedGuesses;
+	}
+
+	public void setMaxNumberOfAllowedGuesses(int maxNumberOfAllowedGuesses) {
+		this.maxNumberOfAllowedGuesses = maxNumberOfAllowedGuesses;
+	}
+
+	public boolean isProgramRunning() {
+		return isProgramRunning;
+	}
+
+	public void setProgramRunning(boolean programRunning) {
+		isProgramRunning = programRunning;
+	}
+
+	public void setGameOver(boolean gameOver) {
+		isGameOver = gameOver;
+	}
+
+	public Scanner getScanner() {
+		return scanner;
 	}
 }
