@@ -1,13 +1,13 @@
 package hangman;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Hangman {
 	private final Scanner scanner;
 	private Word word;
-	private ArrayList<Character> previousLetterGuesses;
-	private ArrayList<String> previousWordGuesses;
+	private LinkedList<Character> previousLetterGuesses;
+	private LinkedList<String> previousWordGuesses;
 	private int numberOfMadeGuesses;
 	private final int maxNumberOfAllowedGuesses;
 
@@ -39,8 +39,8 @@ public class Hangman {
 		while (isProgramRunning) {
 			numberOfLetters = howManyLetters();
 			word = new Word(numberOfLetters); // It will choose a new word every time.
-			previousLetterGuesses = new ArrayList<>(); // Create two empty lists to store user's guesses.
-			previousWordGuesses = new ArrayList<>();
+			previousLetterGuesses = new LinkedList<>(); // Create two empty lists to store user's guesses.
+			previousWordGuesses = new LinkedList<>();
 			numberOfMadeGuesses = 0;
 			System.out.println("I have chosen a new word!");
 
@@ -193,14 +193,14 @@ public class Hangman {
 	private void evaluateWordGuessResult(String guess, int guessResult) {
 		switch (guessResult) {
 			case 1:
-				System.out.println(guess + "is correct!\n");
+				System.out.println(guess + " is correct!\n");
 				word.setDashedWord(word.getChosenWord()); // remove dashes so the game can end
 				break;
 			case 0:
 				System.out.println("You have previously guessed this word. Try again.\n");
 				break;
 			case -1:
-				System.out.println(guess + "is incorrect.\n");
+				System.out.println(guess + " is incorrect.\n");
 				numberOfMadeGuesses++;
 				break;
 			case -2:
