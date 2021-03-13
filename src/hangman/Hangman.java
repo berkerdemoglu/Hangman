@@ -46,6 +46,7 @@ public class Hangman {
 		System.out.println("Enter /help for help with commands.");
 		while (isProgramRunning) {
 			commandResult = 0;
+			isGameOver = false;
 			numberOfLetters = howManyLetters();
 			word = new Word(numberOfLetters); // It will choose a new word every time.
 			previousLetterGuesses = new LinkedList<>(); // Create two empty lists to store user's guesses.
@@ -78,7 +79,7 @@ public class Hangman {
 			if (commandResult != 1 && commandResult != 2) { // if the command is not /new or /end
 				checkUserWin();
 			}
-			if (commandResult == 0) {
+			if (commandResult == 0) { // if no command was entered
 				isProgramRunning = askReplay();
 			}
 		}
@@ -295,17 +296,9 @@ public class Hangman {
 		return returnValue;
 	}
 
-	// Getters and Setters for Command
-	public int getMaxNumberOfAllowedGuesses() {
-		return maxNumberOfAllowedGuesses;
-	}
-
+	//Setters for Commands"
 	public void setMaxNumberOfAllowedGuesses(int maxNumberOfAllowedGuesses) {
 		this.maxNumberOfAllowedGuesses = maxNumberOfAllowedGuesses;
-	}
-
-	public boolean isProgramRunning() {
-		return isProgramRunning;
 	}
 
 	public void setProgramRunning(boolean programRunning) {
@@ -314,9 +307,5 @@ public class Hangman {
 
 	public void setGameOver(boolean gameOver) {
 		isGameOver = gameOver;
-	}
-
-	public Scanner getScanner() {
-		return scanner;
 	}
 }
