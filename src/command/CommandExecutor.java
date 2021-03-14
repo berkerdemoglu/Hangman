@@ -4,7 +4,7 @@ import hangman.Hangman;
 import java.util.Arrays;
 
 public class CommandExecutor {
-	private static final String[] commands = {"/help", "/new", "/exit", "/guesses"};
+	private static final String[] commands = {"/help", "/new", "/hint", "/exit", "/guesses"};
 	private Hangman hangman;
 
 	public CommandExecutor(Hangman hangman) {
@@ -18,6 +18,7 @@ public class CommandExecutor {
 
 		/guesses value - will alter maxNumberOfAllowedGuesses
 		/new - will alter isGameOver
+		/hint will alter word
 		/end - will alter isProgramRunning
 		/help - will print all the available commands including itself
 
@@ -45,6 +46,23 @@ public class CommandExecutor {
 				if (command.length == 1) {
 					hangman.setGameOver(true);
 					returnValue = 1;
+				} else {
+					returnValue = invalidCommand();
+				}
+				break;
+			case "/hint":
+				if (command.length == 1) {
+					// Determine hint to give (a letter)
+					int randomLetterIndex = (int) (Math.random() * hangman.getWord().getChosenWord().length());
+					char hintLetter = hangman.getWord().getChosenWord().charAt(randomLetterIndex);
+					for (int i = 0; i < hangman.getWord().getChosenWord().length(); i++) {
+						if (hangman.getWord().getChosenWord().charAt(i) == hintLetter) {
+							// hint letter may occur more than once, so replace every occurrence with hint
+							hangman.getWord().getDashedWord().setCharAt(i, hintLetter);
+						}
+					}
+
+					System.out.printf("Your hint is %c.\n", hintLetter);
 				} else {
 					returnValue = invalidCommand();
 				}
