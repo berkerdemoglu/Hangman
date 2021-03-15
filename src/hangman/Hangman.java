@@ -61,7 +61,7 @@ public class Hangman {
 			previousLetterGuesses = new LinkedList<>(); // Create two empty lists to store user's guesses.
 			previousWordGuesses = new LinkedList<>();
 			numberOfMadeGuesses = 0;
-			System.out.println("\nI have chosen a new word!");
+			System.out.println("\nI have chosen a new word!\n");
 
 			do {
 				commandResult = 0;
@@ -167,12 +167,15 @@ public class Hangman {
 		 */
 		switch (guessResult) {
 			case 1: // if letter was found in the word
-				System.out.println("You have guessed correctly!\n");
+				int numberRevealed = 0; // the number of times the letter was revealed
+				System.out.println("You have guessed correctly!");
 				for (int i = 0; i < word.getChosenWord().length(); i++) {
 					if (Character.toLowerCase(word.getChosenWord().charAt(i)) == Character.toLowerCase(letter)) {
+						numberRevealed++; // increment the number of times the letter was revealed
 						word.getDashedWord().setCharAt(i, word.getChosenWord().charAt(i));
 					}
 				}
+				System.out.printf("The letter %c was in the word %d times!\n\n", letter, numberRevealed);
 				break;
 			case 0: // if letter was previously guessed
 				System.out.println("You have previously guessed this letter. Try again.\n");
@@ -339,5 +342,9 @@ public class Hangman {
 
 	public void setGameOver(boolean gameOver) {
 		isGameOver = gameOver;
+	}
+
+	public Word getWord() {
+		return word;
 	}
 }
